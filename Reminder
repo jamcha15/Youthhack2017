@@ -1,0 +1,57 @@
+#youth hack - Remind module
+import time, sqlite3
+
+class Reminder():
+    def __init__(self, debug=False, database_name = "youthhack"):
+        
+        self.debug = debug
+        db = sqlite3.connect(database_name)
+        cursor = db.cursor()
+        cursor.execute("""
+CREATE TABLE IF NOT EXISTS reminders
+(remind TEXT, year TEXT, mday TEXT, hour TEXT, min TEXT);""")
+
+        cursor.execute('SELECT * FROM reminders')
+        db.commit()
+        reminders = cursor.fetchall()
+        remind = []
+        for i, row in enumerate(reminders):
+            if self.debug==True:
+                print(i, row)
+                
+            remind.append([])
+            remind[i].append(row[0])
+            remind[i].append([])
+            remind[i][1].append(row[1:-1])
+
+            if self.debug==True:
+                print(remind[i])
+
+            self.get_reminder(remind)
+            
+    def Check(self, remind_time):
+            year,tm_mon, tm_mday, tm_hour, tm_min, tm_wday, tm_yday, tm_isdst=time.localtime()
+            current=[str(year), str(tm_mday), str(tm_hour), str(tm_min)]
+            match = []
+            
+            if self.debug == True:
+                print(current, remind_time)
+            
+            for i, x in enumerate(remind_time): #Bad variable name "x"
+                if x == current[i]:
+                    match.append(True)
+                else:
+                    if self.debug == True:
+                        print("An error occured")
+                    break #Should remove for a variable name instead.
+                
+            if len(match) == 4:
+                self.alert =True
+            else: self.alert = False # returns false if not a match
+
+    def get_reminder(remind):
+        for x in remind:
+            self.Check(x[1])
+            if self.alert==True:
+                AlarmClock(True)
+
